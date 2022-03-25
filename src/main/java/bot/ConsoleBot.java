@@ -11,7 +11,7 @@ public class ConsoleBot
 		while(true) 
 		{
 			 chatAPI.sendMessage("Ведите команду: ", "Console");
-			 commandHandler.handler(chatAPI.getCommand().split(" "), "Console",0l,0l);
+			 commandHandler.handler(chatAPI.getCommand(), "Console",0l,0l);
 			// commandHandler.handler(in.nextLine().toLowerCase(),"Console");
 		}
 	}

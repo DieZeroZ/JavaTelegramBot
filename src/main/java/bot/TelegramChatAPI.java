@@ -1,6 +1,9 @@
 package bot;
 
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import commands.CommandInterface;
+
 import java.util.ArrayList;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -14,20 +17,20 @@ import org.telegram.telegrambots.meta.api.methods.groupadministration.*;
 public class TelegramChatAPI extends TelegramLongPollingBot implements ChatAPI 
 {	
 	private String botToken = System.getenv("TOKEN");
-	CommandHandler handler = new CommandHandler(this);
-
+	private CommandHandler handler = new CommandHandler(this);
+	private CommandInterface command;
+	
 	public void sendMessage(String message, String chatID)
 	{
-		SendMessage mess = new SendMessage();
-		mess.setText(message);
-		mess.setChatId(chatID);
+		SendMessage messageToUser = new SendMessage();
+		messageToUser.setText(message);
+		messageToUser.setChatId(chatID);
 		try {
-			execute(mess);
+			execute(messageToUser);
 		} catch (TelegramApiException e) {
 			e.printStackTrace();
 		}
 	}
-	
 	
 	public void onUpdateReceived(Update update) 
 	{
@@ -40,8 +43,10 @@ public class TelegramChatAPI extends TelegramLongPollingBot implements ChatAPI
 	      //  messageFromUser =update.getMessage().getText().toLowerCase();
 	       // userChatID = update.getMessage().getChatId().toString();
 			System.out.printf("%s    %s\n",update.getMessage().getText().toLowerCase(),update.getMessage().getFrom().getUserName().toString());
-			handler.handler(update.getMessage().getText().toLowerCase().split(" "), update.getMessage().getChatId().toString(),update.getMessage().getFrom().getId(),getIdOfReplyUser(update.getMessage()));
-		
+			 
+			command = handler.handler(update.getMessage().getText().toLowerCase(), update.getMessage().getChatId().toString(),update.getMessage().getFrom().getId(),getIdOfReplyUser(update.getMessage()));
+			if(command != null)
+			command.makeCommand();
 	        System.out.println(update.getMessage().getEntities());
 	     // sendMessage(update.getMessage().getText(),update.getMessage().getChatId().toString()); // Call method to send the message
 	    }
@@ -126,7 +131,7 @@ public class TelegramChatAPI extends TelegramLongPollingBot implements ChatAPI
 		{
 			if(memb.getStatus().equals(member.getStatus())) 
 			{
-				System.out.println("ахуеешь");
+				System.out.println("...");
 				return true;
 			}
 		}
